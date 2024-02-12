@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const axios = require("axios");
 const path = require("path");
+const FormData = require('form-data');
 
 const app = express();
 const port = 3000;
@@ -22,42 +23,24 @@ app.get("/", (req, res) => {
   res.render("index", { result: null, error: null });
 });
 
-// Handle the file upload and send it to Flask for prediction
-// app.post("/upload", upload.single("image"), async (req, res) => {
-//   try {
-//     // Send the image to the Flask server (replace 'http://flask-server-url/predict' with your actual Flask server URL)
-//     const flaskResponse = await axios.post("http://127.0.0.1:5000/predict", {
-//       image: req.file.buffer.toString("base64"),
-//     });
-
-//     // Render the result on the webpage
-//     res.render("index", {
-//       result: flaskResponse.data.result,
-//       error: flaskResponse.data.error,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.render("index", { error: "Error processing the image(from node)" ,result : null});
-//   }
-// });
-app.post("/upload", upload.single("image"), async (req, res) => {
+app.post('/upload', upload.single('image'), async (req, res) => {
   try {
-    const imageBuffer = fs.readFileSync(req.file.path);
-    const imageBase64 = imageBuffer.toString("base64");
+    // Create a FormData object and append the image file
+    const formData = new FormData();
+    formData.append('image', req.file.buffer, { filename: 'image.jpg' });
 
-    // Send the image to the Flask server
-    const flaskResponse = await axios.post("http://127.0.0.1:5000", {
-      image: imageBase64,
+    // Send the FormData to the Flask server
+    const response = await axios.post('http://127.0.0.1:5000/predict', formData, {
+      headers: {
+        ...formData.getHeaders(),
+      },
     });
 
-    // Render the result on the webpage
-    res.render("index", {
-      result: flaskResponse.data.result,
-      error: flaskResponse.data.error,
-    });
+    // Render the result in the EJS template
+    res.render('index', { error: null, result: response.data.result });
   } catch (error) {
     console.error(error);
-    res.render("index", { error: "Error processing the image", result: null });
+    res.render('index', { error: 'Error processing the image', result: null });
   }
 });
 
