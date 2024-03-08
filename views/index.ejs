@@ -35,6 +35,10 @@
       <% if (result) { %>
         <div class="alert alert-success" role="alert">
           <strong>Result:</strong> <%= result %>
+          <% if (accuracy) { %>
+            <br>
+            <strong>Accuracy:</strong> <%= (accuracy * 100).toFixed(2) %>% <!-- Display accuracy as a percentage -->
+          <% } %>
         </div>
       <% } %>
 

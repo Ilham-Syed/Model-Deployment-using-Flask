@@ -37,7 +37,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     });
 
     // Render the result in the EJS template
-    res.render('index', { error: null, result: response.data.result });
+    res.render('index', { error: null, result: response.data.result ,accuracy: response.data.accuracy});
   } catch (error) {
     console.error(error);
     res.render('index', { error: 'Error processing the image', result: null });

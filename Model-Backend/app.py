@@ -37,10 +37,12 @@ def predict():
         # Make predictions using the loaded model
         predictions = model.predict(preprocessed_image)
 
+        prediction_probability = predictions[0, 0]
+
         # Assuming binary classification, you can customize this based on your model output
         prediction_result = "Non-Dementia" if predictions[0, 0] > 0.5 else "Dementia"
 
-        return jsonify({'result': prediction_result})
+        return jsonify({'result': prediction_result,'accuracy': float(prediction_probability)})
 
     except Exception as e:
         print(str(e))
